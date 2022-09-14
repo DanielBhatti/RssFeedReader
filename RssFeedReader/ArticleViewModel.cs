@@ -67,11 +67,16 @@ namespace RssFeedReader
                 foreach (string filterWord in filterText.Split(' '))
                 {
                     string trimmedFilterWord = filterWord.Trim();
-                    if (article.Title.Contains(trimmedFilterWord)) articleWordFrequency[article]++;
-                    if (article.Content.Contains(trimmedFilterWord)) articleWordFrequency[article]++;
+                    if (article.Title != null && article.Title.Contains(trimmedFilterWord)) articleWordFrequency[article]++;
+                    if (article.Content != null && article.Content.Contains(trimmedFilterWord)) articleWordFrequency[article]++;
                 }
             }
             return new ObservableCollection<Article>(articleCollection.Where(f => articleWordFrequency[f] > 0).OrderByDescending(f => articleWordFrequency[f]));
+        }
+
+        public void Refresh()
+        {
+
         }
     }
 }

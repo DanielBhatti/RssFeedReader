@@ -70,17 +70,23 @@ namespace RssFeedReader
 
         public async void AddFeed(string feedUriCsv)
         {
+            if (String.IsNullOrEmpty(feedUriCsv))
+            {
+                DisplayText = "Must provide URI for at least one RSS feed.";
+                return;
+            }
             foreach (string feedUri in feedUriCsv.Split(',').Select(f => f.Trim()))
             {
                 try
                 {
+                    // maybe also try adding /feed to the end of the URI
                     Feed feed = await FeedReader.ReadAsync(feedUri);
-                    if (FullFeedCollection.Select(f => f.Uri).Contains(feedUri))
+                    if (FullFeedCollection.Select(f => f.FeedUri).Contains(feedUri))
                     {
                         DisplayText = $"Feed with URI {feedUri} already exists as {feed.Title}.";
                         return;
                     }
-                    FullFeedCollection.Add(RssFeed.FromCodeHollowFeedReader(feed));
+                    FullFeedCollection.Add(RssFeed.FromCodeHollowFeedReader(feed, feedUri));
                     SaveFeedList();
                     DisplayText = $"Successfully added feed {feed.Title} to list.";
                 }
@@ -93,7 +99,8 @@ namespace RssFeedReader
 
         public void DeleteFeed(string feedUri)
         {
-
+            RssFeed? feed = FullFeedCollection.FirstOrDefault(f => f.FeedUri == feedUri);
+            if (feed != null) FullFeedCollection.Remove(feed.Value);
         }
 
         public void SaveFeedList()

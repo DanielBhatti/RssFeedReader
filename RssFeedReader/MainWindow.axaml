@@ -52,7 +52,7 @@
 							<DataTemplate>
 								<UniformGrid>
 									<TextBox Text="{Binding Title}" IsReadOnly="True"/>
-									<CheckBox/>
+									<Button Content="Delete Feed" Command="{Binding $parent[Window].DataContext.DeleteFeed}" CommandParameter="{Binding FeedUri}"/>
 								</UniformGrid>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>

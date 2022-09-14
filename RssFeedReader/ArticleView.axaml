@@ -3,6 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.In
+teractivity"
+			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 xmlns:hr="clr-namespace:Avalonia.Controls.Html;assembly=Avalonia.HtmlRenderer"
              x:Class="RssFeedReader.ArticleView">
@@ -16,7 +19,10 @@
 			<ListBox Items="{Binding DisplayedArticleCollection}" IsTabStop="False" SelectedItem="{Binding SelectedArticle}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<TextBox Text="{Binding Title}" IsReadOnly="True" TextWrapping="Wrap"/>
+						<Grid ColumnDefinitions="0.4*,0.6*">
+							<TextBlock Grid.Column="0" Text="{Binding SiteTitle}" TextWrapping="Wrap"/>
+							<TextBlock Grid.Column="1" Text="{Binding Title}" TextWrapping="Wrap"/>
+						</Grid>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ListBox>
