@@ -50,6 +50,8 @@ namespace RssFeedReader
             set => this.RaiseAndSetIfChanged(ref _selectedArticle, value);
         }
 
+        public ArticleViewModel ArticleViewModel { get; }
+
         public MainWindowViewModel()
         {
             AppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(RssFeedReader));
@@ -59,12 +61,11 @@ namespace RssFeedReader
             if (!File.Exists(FeedListPath)) File.Create(FeedListPath);
 
             string json;
-            using (StreamReader reader = new StreamReader(FeedListPath))
-            {
-                json = reader.ReadToEnd();
-            }
+            using (StreamReader reader = new StreamReader(FeedListPath)) json = reader.ReadToEnd();
             if (!String.IsNullOrEmpty(json)) FullFeedCollection = JsonSerializer.Deserialize<ObservableCollection<RssFeed>>(json) ?? new();
             else FullFeedCollection = new();
+
+            ArticleViewModel = new ArticleViewModel();
         }
 
         public async void AddFeed(string feedUriCsv)

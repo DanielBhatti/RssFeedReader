@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:local="using:RssFeedReader"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:hr="clr-namespace:Avalonia.Controls.Html;assembly=Avalonia.HtmlRenderer"
+             x:Class="RssFeedReader.ArticleView">
+	<Design.DataContext>
+		<local:ArticleViewModel/>
+	</Design.DataContext>
+
+	<StackPanel>
+		<TextBox Text="{Binding $parent[UserControl].DataContext.FilterText}"/>
+		<Grid ColumnDefinitions="0.3*,*">
+			<ListBox Items="{Binding DisplayedArticleCollection}" IsTabStop="False" SelectedItem="{Binding SelectedArticle}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<TextBox Text="{Binding Title}" IsReadOnly="True" TextWrapping="Wrap"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ListBox>
+			<hr:HtmlLabel Grid.Column="1" Text="{Binding $parent[UserControl].DataContext.SelectedArticle.Content}"/>
+		</Grid>
+	</StackPanel>
+</UserControl>
