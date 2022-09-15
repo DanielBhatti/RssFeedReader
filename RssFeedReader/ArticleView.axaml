@@ -6,27 +6,40 @@
 			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.In
 teractivity"
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="450"
 			 xmlns:hr="clr-namespace:Avalonia.Controls.Html;assembly=Avalonia.HtmlRenderer"
              x:Class="RssFeedReader.ArticleView">
 	<Design.DataContext>
 		<local:ArticleViewModel/>
 	</Design.DataContext>
 
-	<StackPanel>
-		<TextBox Text="{Binding $parent[UserControl].DataContext.FilterText}"/>
-		<Grid ColumnDefinitions="0.3*,*">
+	<Grid RowDefinitions="Auto,*">
+		<TextBox Grid.Row="0" Text="{Binding $parent[UserControl].DataContext.FilterText}"/>
+		<Grid Grid.Row="1" ColumnDefinitions="0.3*,*">
 			<ListBox Items="{Binding DisplayedArticleCollection}" IsTabStop="False" SelectedItem="{Binding SelectedArticle}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Grid ColumnDefinitions="0.4*,0.6*">
+						<Grid ColumnDefinitions="0.4*,0.6*, 0.6*">
 							<TextBlock Grid.Column="0" Text="{Binding SiteTitle}" TextWrapping="Wrap"/>
 							<TextBlock Grid.Column="1" Text="{Binding Title}" TextWrapping="Wrap"/>
+							<TextBlock Grid.Column="2" Text="{Binding PublishingDate}" TextWrapping="Wrap"/>
 						</Grid>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ListBox>
-			<hr:HtmlLabel Grid.Column="1" Text="{Binding $parent[UserControl].DataContext.SelectedArticle.Content}"/>
+			<!--<DataGrid Grid.Column="0" Items="{Binding DisplayedArticleCollection}" IsTabStop="False" SelectedItem="{Binding SelectedArticle}" AutoGenerateColumns="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Binding="{Binding SiteTitle}"/>
+					<DataGridTextColumn Binding="{Binding Title}"/>
+				</DataGrid.Columns>
+			</DataGrid>-->
+			<ScrollViewer Grid.Column="1" Height="{Binding $parent.Height}">
+				<Grid RowDefinitions="Auto,Auto,*" Margin="30">
+					<Button Grid.Row="0" Content="{Binding SelectedArticle.SiteUri}" Foreground="Blue" Background="Transparent" Command="{Binding OpenHyperlink}" CommandParameter="{Binding SelectedArticle.SiteUri}"/>
+					<TextBlock Grid.Row="1" Text="{Binding SelectedArticle.Title}" FontSize="20"/>
+					<hr:HtmlLabel Grid.Row="2" Text="{Binding SelectedArticle.Content}"/>
+				</Grid>
+			</ScrollViewer>
 		</Grid>
-	</StackPanel>
+	</Grid>
 </UserControl>

@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace RssFeedReader
@@ -72,6 +74,35 @@ namespace RssFeedReader
                 }
             }
             return new ObservableCollection<Article>(articleCollection.Where(f => articleWordFrequency[f] > 0).OrderByDescending(f => articleWordFrequency[f]));
+        }
+
+        public void OpenHyperlink(string hyperlink)
+        {
+            try
+            {
+                Process.Start(hyperlink);
+            }
+            catch
+            {
+                // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    hyperlink = hyperlink.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", hyperlink);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", hyperlink);
+                }
+                else
+                {
+                    // do some logging here
+                }
+            }
         }
 
         public void Refresh()
