@@ -26,24 +26,7 @@
 			<TabItem Header="Article Viewer">
 				<local:ArticleView DataContext="{Binding ArticleViewModel}"/>
 			</TabItem>
-			
-			<TabItem Header="Feed Viewer">
-				<StackPanel>
-					<TextBox Text="{Binding $parent.DataContext.FilterText}"/>
-					<Grid ColumnDefinitions="0.3*,*">
-						<ItemsControl Items="{Binding DisplayedArticleCollection}" IsTabStop="False">
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<TextBox Text="{Binding Title}" IsReadOnly="True" TextWrapping="Wrap"/>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-						<hr:HtmlLabel Grid.Column="1" Text="{Binding $parent[Window].DataContext.SelectedArticle.Content}"/>
-					</Grid>
-					<TextBlock Text="{Binding DisplayText}"/>
-				</StackPanel>
-			</TabItem>
-			<TabItem Header="Feed Modifier">
+			<TabItem Header="Add New Feed">
 				<StackPanel>
 					<TextBox Text="{Binding NewUriFeedName}" ToolTip.Tip="Paste the RSS Feed URI here. Add multiple feeds by separating each URI with a comma."/>
 					<Button Content="Add Feed" Command="{Binding AddFeed}" CommandParameter="{Binding NewUriFeedName}"/>
@@ -51,12 +34,14 @@
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<UniformGrid>
-									<TextBox Text="{Binding Title}" IsReadOnly="True"/>
+									<TextBox Text="{Binding Title}" IsReadOnly="True" BorderThickness="0"/>
+									<TextBox Text="{Binding FeedUri}" IsReadOnly="True" BorderThickness="0"/>
 									<Button Content="Delete Feed" Command="{Binding $parent[Window].DataContext.DeleteFeed}" CommandParameter="{Binding FeedUri}"/>
 								</UniformGrid>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>
+					<TextBlock Text="{Binding DisplayText}"/>
 				</StackPanel>
 			</TabItem>
 		</TabControl>

@@ -12,7 +12,7 @@ namespace RssFeedReader;
 
 public class ArticleViewModel : ViewModelBase
 {
-    private string _filterText;
+    private string _filterText = "";
     public string FilterText
     {
         get => _filterText;
@@ -29,8 +29,8 @@ public class ArticleViewModel : ViewModelBase
     public ObservableCollection<Article> FullArticleCollection { get; }
     public ObservableCollection<Article> DisplayedArticleCollection { get => GetDisplayedCollection(FullArticleCollection, _filterText); }
 
-    private Article _selectedArticle;
-    public Article SelectedArticle
+    private Article? _selectedArticle;
+    public Article? SelectedArticle
     {
         get => _selectedArticle;
         set => this.RaiseAndSetIfChanged(ref _selectedArticle, value);
@@ -51,8 +51,16 @@ public class ArticleViewModel : ViewModelBase
         }
         if (!String.IsNullOrEmpty(json))
         {
-            var feeds = JsonSerializer.Deserialize<ObservableCollection<RssFeed>>(json) ?? new();
-            FullArticleCollection = new ObservableCollection<Article>(feeds.SelectMany(f => f.Articles));
+            try
+            {
+                var feedUrls = JsonSerializer.Deserialize<List<string>>(json) ?? new();
+                var feeds = feedUrls.Select(f => new RssFeed(f));
+                FullArticleCollection = new ObservableCollection<Article>(feeds.SelectMany(f => f.Articles));
+            }
+            catch
+            {
+                FullArticleCollection = new();
+            }
         }
         else FullArticleCollection = new();
     }
@@ -90,17 +98,11 @@ public class ArticleViewModel : ViewModelBase
                 hyperlink = hyperlink.Replace("&", "^&");
                 Process.Start(new ProcessStartInfo(hyperlink) { UseShellExecute = true });
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Process.Start("xdg-open", hyperlink);
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Process.Start("open", hyperlink);
-            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) Process.Start("xdg-open", hyperlink);
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) Process.Start("open", hyperlink);
             else
             {
-                // do some logging here
+
             }
         }
     }

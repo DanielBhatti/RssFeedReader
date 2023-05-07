@@ -1,4 +1,3 @@
-using CodeHollow.FeedReader;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -18,21 +17,21 @@ public class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<RssFeed> DisplayedFeedCollection { get => GetFilteredFeedCollection(); }
 
-    private string _newUriFeedName;
-    public string NewUriFeedName
+    private string? _newUriFeedName;
+    public string? NewUriFeedName
     {
         get => _newUriFeedName;
         set => this.RaiseAndSetIfChanged(ref _newUriFeedName, value);
     }
 
-    private string _displayText;
+    private string _displayText = "";
     public string DisplayText
     {
         get => _displayText;
         set => this.RaiseAndSetIfChanged(ref _displayText, value);
     }
 
-    private string _filterText;
+    private string _filterText = "";
     public string FilterText
     {
         get => _filterText;
@@ -58,12 +57,18 @@ public class MainWindowViewModel : ViewModelBase
         if (!Directory.Exists(AppDataPath)) Directory.CreateDirectory(AppDataPath);
 
         FeedListPath = Path.Combine(AppDataPath, "feeds.txt");
-        if (!File.Exists(FeedListPath)) File.Create(FeedListPath);
+        if (!File.Exists(FeedListPath)) File.Create(FeedListPath).Close();
+
+        FullFeedCollection = new();
 
         string json;
         using (StreamReader reader = new StreamReader(FeedListPath)) json = reader.ReadToEnd();
-        if (!String.IsNullOrEmpty(json)) FullFeedCollection = JsonSerializer.Deserialize<ObservableCollection<RssFeed>>(json) ?? new();
-        else FullFeedCollection = new();
+
+        List<string> feedUris;
+        if (!String.IsNullOrEmpty(json)) feedUris = JsonSerializer.Deserialize<List<string>>(json) ?? new();
+        else feedUris = new();
+
+        foreach (string feedUri in feedUris) AddFeed(feedUri);
 
         ArticleViewModel = new ArticleViewModel();
     }
@@ -80,21 +85,22 @@ public class MainWindowViewModel : ViewModelBase
             try
             {
                 // maybe also try adding /feed to the end of the URI
-                Feed feed = await FeedReader.ReadAsync(feedUri);
                 if (FullFeedCollection.Select(f => f.FeedUri).Contains(feedUri))
                 {
-                    DisplayText = $"Feed with URI {feedUri} already exists as {feed.Title}.";
+                    DisplayText = $"Feed with URI {feedUri} already exists.";
                     return;
                 }
-                FullFeedCollection.Add(RssFeed.FromCodeHollowFeedReader(feed, feedUri));
+                FullFeedCollection.Add(new RssFeed(feedUri));
                 SaveFeedList();
-                DisplayText = $"Successfully added feed {feed.Title} to list.";
+                DisplayText = $"Successfully added feed {feedUri} to list.";
             }
             catch (Exception e)
             {
                 DisplayText = $"Failed to add feed with URI {feedUri} to list.\n\n{e}";
             }
         }
+
+        // load articles here
     }
 
     public void DeleteFeed(string feedUri)
@@ -107,7 +113,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         using (StreamWriter writer = new StreamWriter(FeedListPath))
         {
-            string json = JsonSerializer.Serialize(FullFeedCollection);
+            string json = JsonSerializer.Serialize(FullFeedCollection.Select(f => f.FeedUri).ToList());
             writer.Write(json);
         }
     }
